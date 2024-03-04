@@ -7,5 +7,5 @@ import java.beans.JavaBean;
 
 public interface OTPRepository extends JpaRepository<OTP, Long> {
     OTP findByOtpAndIsValidTrue(Long otp);
-    OTP findByOtpAndUserIdAndIsValidTrue(Long otp, Long userId);
+    OTP findByOtpAndPhoneNumberAndIsValidTrue(Long otp, String userId);
 }

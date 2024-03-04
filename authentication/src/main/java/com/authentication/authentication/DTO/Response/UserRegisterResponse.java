@@ -16,4 +16,5 @@ public class UserRegisterResponse {
     private String email;
     private ResponseData responseData;
     private Long userId;
+    private String jwtToken;
 }

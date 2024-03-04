@@ -10,7 +10,6 @@ import com.authentication.authentication.Repository.UsersRepository;
 import com.authentication.authentication.Service.OTPService;
 import com.authentication.authentication.Service.UserRegisterService;
 import lombok.Builder;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,9 @@ public class UserRegisterImpl implements UserRegisterService {
     OTPRepository otpRepository;
 
     @Autowired
-    OTPService otpService;
+    private OTPService otpService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public UserRegisterResponse registerUser(UserRegisterRequest user) {
@@ -40,6 +41,7 @@ public class UserRegisterImpl implements UserRegisterService {
             newUser.setUsername(user.getUserName());
             newUser.setEmail(user.getEmail());
             newUser.setPassword(user.getPassword());
+            newUser.setPhoneNumber(user.getPhoneNumber());
             userRepo.save(newUser);
             userResp.setEmail(newUser.getEmail());
             userResp.setUserName(newUser.getUsername());
@@ -61,7 +63,7 @@ public class UserRegisterImpl implements UserRegisterService {
             }
 
             //send OTP
-            otpService.sendOTP(existingUsers.getEmail(), existingUsers.getId());
+            otpService.sendOTP(existingUsers.getEmail(), existingUsers.getId(), existingUsers.getPhoneNumber());
 
             responseData.setResponseMessage("OTP sent Successfully");
             responseData.setResponseCode(200);
@@ -69,7 +71,6 @@ public class UserRegisterImpl implements UserRegisterService {
             response.setEmail(user.getEmail());
             response.setUserName(existingUsers.getUsername());
             response.setUserId(existingUsers.getId());
-
         }catch (Exception e){
             System.out.println(e.getMessage());
             responseData.setResponseCode(500);
@@ -84,7 +85,7 @@ public class UserRegisterImpl implements UserRegisterService {
         UserRegisterResponse response = new UserRegisterResponse();
         ResponseData responseData = new ResponseData();
         try{
-            OTP existingOTP = otpRepository.findByOtpAndUserIdAndIsValidTrue(user.getOtp(), user.getUserId());
+            OTP existingOTP = otpRepository.findByOtpAndPhoneNumberAndIsValidTrue(user.getOtp(), user.getPhoneNumber());
             if(existingOTP==null){
                 throw new Exception("Wrong OTP");
             }
@@ -93,6 +94,10 @@ public class UserRegisterImpl implements UserRegisterService {
             otpRepository.save(existingOTP);
 
             //OTP is validated now generate Access Token
+            String jwtTokenGenerated = jwtUtil.generateToken(user.getPhoneNumber());
+
+            response.setJwtToken(jwtTokenGenerated);
+
             responseData.setResponseCode(200);
             responseData.setResponseMessage("OTP validated Successfully");
         }catch (Exception e){

@@ -21,4 +21,5 @@ public class OTP {
     private Long userId;
     private Long otp;
     private Boolean isValid;
+    private String phoneNumber;
 }

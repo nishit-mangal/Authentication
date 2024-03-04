@@ -20,6 +20,6 @@ public class Users {
 
     @Column(unique = true)
     private String email;
-
+    private String phoneNumber;
     private String password;
 }

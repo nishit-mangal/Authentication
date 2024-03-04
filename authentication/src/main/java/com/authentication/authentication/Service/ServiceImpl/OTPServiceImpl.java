@@ -22,7 +22,7 @@ public class OTPServiceImpl implements OTPService {
 
     @Override
     @Async
-    public void sendOTP(String email, Long userId){
+    public void sendOTP(String email, Long userId, String phoneNumber){
         Long otp = generateOTP();
         OTP existingOtp = otpRepo.findByOtpAndIsValidTrue(otp);
 
@@ -33,7 +33,7 @@ public class OTPServiceImpl implements OTPService {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom("mangalnishit07@gmail.com");
-        mailMessage.setTo(email);
+        mailMessage.setTo("nishitm18e@iiitt.ac.in");
         mailMessage.setSubject("Your One-Time Password (OTP)");
         mailMessage.setText("Your OTP is: " + otp);
 
@@ -44,6 +44,7 @@ public class OTPServiceImpl implements OTPService {
         saveOtp.setOtp(otp);
         saveOtp.setOtpSentDate(new Date());
         saveOtp.setUserId(userId);
+        saveOtp.setPhoneNumber(phoneNumber);
         otpRepo.save(saveOtp);
     }
     private Long generateOTP() {

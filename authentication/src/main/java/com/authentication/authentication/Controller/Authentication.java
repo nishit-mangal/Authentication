@@ -7,10 +7,7 @@ import com.authentication.authentication.Service.UserRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/authenticate")
@@ -22,6 +19,12 @@ public class Authentication {
     public ResponseEntity<UserRegisterResponse> registerUsers(@RequestBody UserRegisterRequest userReq){
         UserRegisterResponse userResp = new UserRegisterResponse();
         ResponseData responseData = new ResponseData();
+        if(userReq.getEmail()==null || userReq.getPassword()==null || userReq.getPhoneNumber()==null || userReq.getUserName()==null || userReq.getPhoneNumber().length()!=10){
+            responseData.setResponseCode(400);
+            responseData.setResponseMessage("Missing Parameters");
+            userResp.setResponseData(responseData);
+            return new ResponseEntity<UserRegisterResponse>(userResp, HttpStatusCode.valueOf(200));
+        }
         userResp = userService.registerUser(userReq);
         if(userResp==null || userResp.getUserName()==null || userResp.getEmail()==null){
             responseData.setResponseCode(400);
@@ -38,13 +41,29 @@ public class Authentication {
     @PostMapping("/login")
     public ResponseEntity <UserRegisterResponse> loginUser(@RequestBody UserRegisterRequest userReq){
         UserRegisterResponse userResp = new UserRegisterResponse();
-        userResp = userService.validateLogin(userReq);
+        //validation
+        if(userReq.getEmail()==null || userReq.getPassword()==null){
+            ResponseData responseData = new ResponseData();
+            responseData.setResponseCode(400);
+            responseData.setResponseMessage("Missing Parameters");
+            userResp.setResponseData(responseData);
+        }else{
+            userResp = userService.validateLogin(userReq);
+        }
         return new ResponseEntity<UserRegisterResponse>(userResp, HttpStatusCode.valueOf(200));
     }
 
-    @PostMapping("/validateOTP")
+    @PostMapping("/validatePhoneAndOTP")
     public ResponseEntity <UserRegisterResponse> validateOTP(@RequestBody UserRegisterRequest userReq){
         UserRegisterResponse userResp = new UserRegisterResponse();
+        //input validation
+        if(userReq.getOtp()==null || userReq.getPhoneNumber()==null){
+            ResponseData responseData = new ResponseData();
+            responseData.setResponseCode(400);
+            responseData.setResponseMessage("Invalid Input");
+            userResp.setResponseData(responseData);
+            return new ResponseEntity<UserRegisterResponse>(userResp, HttpStatusCode.valueOf(200));
+        }
         userResp = userService.validateOTP(userReq);
         return new ResponseEntity<UserRegisterResponse>(userResp, HttpStatusCode.valueOf(200));
     }

@@ -13,12 +13,17 @@ public class UserRegisterRequest {
     private String email;
     private Long otp;
     private Long userId;
+    private String phoneNumber;
+
     @Override
     public String toString() {
         return "UserRegisterRequest{" +
                 "userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
+                ", otp=" + otp +
+                ", userId=" + userId +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
     }
 }
